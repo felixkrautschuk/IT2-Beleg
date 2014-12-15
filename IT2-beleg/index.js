@@ -1,12 +1,25 @@
+var MAX_LENGTH = 14;
+
 function start() 
 {
+    var anzGleichungen = document.getElementById("anzahlGleichungen").value;
+    var anzVariablen = document.getElementById("anzahlUnbekannte").value;
+    
+    if ( anzGleichungen <= 0 || anzGleichungen > MAX_LENGTH || anzVariablen <= 0 || anzVariablen > MAX_LENGTH) {
+        alert("Bitte nur Zahlen zwischen 1 und " + MAX_LENGTH + " eingeben!");
+        return;
+    }
+    
+    anzVariablen++;
+    
     if (document.getElementById("reusableForm") != null) {
         node.parentNode.removeChild(document.getElementById("reusableForm"));
     }
     node = document.getElementById("matrix");
-    node.parentNode.insertBefore(createTable(document.getElementById("anzahlGleichungen").value,                                document.getElementById("anzahlUnbekannte").value), node );
-//    node.parentNode.insertAdjacentHTML('','');
+    node.parentNode.insertBefore(createTable(anzGleichungen, anzVariablen), node );
 } 
+
+
 
 function createTable(row, col, id) 
 {
@@ -15,8 +28,26 @@ function createTable(row, col, id)
     formid.value = "reusableForm";
     form.setAttributeNode(formid);
     var action = document.createAttribute("action");
-    action.value = "gauss.cgi"
+    action.value = "./gauss.out";
+    var method = document.createAttribute("METHOD");
+    method.value = "GET";
+    form.setAttributeNode(method);
     form.setAttributeNode(action);
+    
+    form.onsubmit = function()
+    {
+        for(var j = 0; j < row; j++) 
+        {
+            for(var i = 0; i < col; i++) 
+            {
+                if ( document.getElementById(j + "-" + i).value == "" ) 
+                {
+                    alert("Folgendes Matrizenelement ist leer: \nGleichung: " + (j+1) + " Feld: " + (i+1));
+                    return false;
+                }
+            }
+        }
+    }
     
     // EKELHAFT(BEFEHL)
     var rowP = document.createElement("input");
@@ -50,20 +81,32 @@ function createTable(row, col, id)
         {
             mycurrent_cell = document.createElement("td");  
             var newTextfield = document.createElement("input");
-            newTextfield.value = "3";
+//            newTextfield.value = "3";
             var atts = document.createAttribute("id");
             atts.value = j + "-" + i;
             var name = document.createAttribute("name");
             name.value = "var" + atts.value;
+            var style = document.createAttribute("style");
+            style.value = "height: 20px; width: 35px;";
             newTextfield.setAttributeNode(atts);
             newTextfield.setAttributeNode(name);
+            newTextfield.setAttributeNode(style);
             mycurrent_cell.appendChild(newTextfield);
             mycurrent_row.appendChild(mycurrent_cell);
+            if ( i < col - 2 ) {
+                var label = document.createElement("label");
+                label.innerHTML = "x<sub>" + (i+1) + "</sub> +";
+                mycurrent_row.appendChild(label);
+            }
+            else if ( i == col - 2 ) {
+                var label = document.createElement("label");
+                label.innerHTML = "x<sub>" + (i+1) + "</sub> =";
+                mycurrent_row.appendChild(label);
+            }
         }
         mytablebody.appendChild(mycurrent_row);
     }
     myTable.appendChild(mytablebody);
-    //myTable.setAttribute("ID", id);
     form.appendChild(myTable);
     var submitButton = document.createElement("input");
     var type = document.createAttribute("type");

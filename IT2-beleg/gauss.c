@@ -25,7 +25,7 @@ int Gaussalg (float a[][MAX_LENGTH], int n, float x[],int *r,int druck,float *de
 
 int main(int argc, const char * argv[]) {
     
-    printf("Content-Type:text/html");
+    puts("Content-type: text/html\n\n");
     
     puts("<!DOCTYPE html>");
     puts("<head>");
@@ -33,6 +33,7 @@ int main(int argc, const char * argv[]) {
     puts("</head>");
     puts("<body>");
     
+
     // Eingabestring
     char *data = getenv("QUERY_STRING");
     if(data == NULL)
@@ -42,7 +43,7 @@ int main(int argc, const char * argv[]) {
         return -1;
     }
     
-    printf("String: %s", data);
+    // printf("String: %s", data);
     
 //    char data[512];
     
