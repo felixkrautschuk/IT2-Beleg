@@ -19,13 +19,31 @@ int col;
 int getValueI(char *string);
 float getValueF(char *string);
 void printArray(char **array);
+void beenden();
 
 int Gaussalg (float a[][MAX_LENGTH], int n, float x[],int *r,int druck,float *det);
 
 int main(int argc, const char * argv[]) {
     
+    
+    puts("<!DOCTYPE html>");
+    puts("<head>");
+    puts("  <meta charset=\"utf-8\">");
+    puts("</head>");
+    puts("<body>");
+    
     // Eingabestring
-    char data[] = "row=3&col=4&var0-0=5&var0-1=-1&var0-2=3&var0-3=26&var1-0=1&var1-1=-2&var1-2=1&var1-3=15&var2-0=-1&var2-1=3&var2-2=4&var2-3=15";
+    char *data = getenv("QUERY_STRING");
+    if(data == NULL)
+    {
+        printf("<P>Error! Error in passing data from form to script.");
+        beenden();
+        return -1;
+    }
+    
+    printf("String: %s", data);
+    
+//    char data[512];
     
     // strtok holt die jeweiligen Werte heraus, getrennt durch "&"
     char *tempRow = strtok(data, "&");
@@ -77,11 +95,6 @@ int main(int argc, const char * argv[]) {
     }
     
     
-    puts("<!DOCTYPE html>");
-    puts("<head>");
-    puts("  <meta charset=\"utf-8\">");
-    puts("</head>");
-    puts("<body>");
     
 
     int n=col - 1;//Anzahl der Unbekannten(in der Regel =Anzahl Gleichungen)!!
@@ -99,11 +112,15 @@ int main(int argc, const char * argv[]) {
             printf("<br>  %d Parameter erforderlich!<br><br>",n-rg);
     }
     
+    beenden();
+    
+    return 0;
+}
+
+void beenden() {
     
     puts("</body>");
     puts("</html>");
-    
-    return 0;
 }
 
 int getValueI(char *string) {
