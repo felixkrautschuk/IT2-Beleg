@@ -1,33 +1,135 @@
-//Gausscher Algorithmus mit Pivotisierung  Stand 8.12.2012
-//maximal 100 Gleichungen
-//Genauigkeit des Ausdrucks betraegt nur 2 Dezimalen
-//Achtung: die Spaltenanzahl der Matrix a in  der Kopfzeile der Funktion 
-//Gaussalg muss immer als Konstante den Wert n+1 erhalten, 
-//d.h. um eins groesser als die Anzahl der Unbekannten sein (rechte Seite!)
-
 #define _CRT_SECURE_NO_WARNINGS
-#include <math.h>
-#include <stdio.h>
 
-//  Gauss'sches Eliminationsverfahren mit Zeilenpivotisierung
-//    Argumente:
-//    float a[N][n+1]  erweiterte Koeffizientenmatrix         Read/Write
-//            N        Anzahl der Gleichungen
-//    int n            Anzahl der Unbekannten                 Read
-//    float x[n]       Loesungen                              Write
-//    int* r           Rangzahl (wird bei Rangabfall belegt)  Write
-//    int druck        1 Druckprotokoll,0 kein Protokoll      Read
-//    float *det       Determinante der Koeffizientenmatrix   Write 
-//  Resultat: (Rueckkehrwert von Gaussalg)
-//             0 fuer Widerspruch - unloesbar
-//             1 fuer eindeutig loesbar
-//             2 fuer mehrdeutig loesbar und Rang=r,
-//                    Anzahl der Parameter ist n-r
-//Beachte: Ist N<n, dann muss aber trotzdem die Koeffizientenmatrix
-//                  mit N=n deklariert werden, aber die fehlenden Gleichungen
-//                  müssen nicht eingegeben werden!
-//         Ist N>n, dann muss die Koeffizientenmatrix mit N Zeilen deklariert werden  
-int Gaussalg(float a[][4], int n, float x[], int *r, int druck, float *det)
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+
+#define MAX_LENGTH 15
+
+int row;
+int col;
+
+int getValueI(char *string);
+float getValueF(char *string);
+void printArray(char **array);
+
+int Gaussalg(float a[][MAX_LENGTH], int n, float x[], int *r, int druck, float *det);
+
+int main(int argc, const char * argv[]) {
+
+	// Eingabestring
+	char data[] = "row=3&col=4&var0-0=5&var0-1=-1&var0-2=3&var0-3=26&var1-0=1&var1-1=-2&var1-2=1&var1-3=15&var2-0=-1&var2-1=3&var2-2=4&var2-3=15";
+
+	// strtok holt die jeweiligen Werte heraus, getrennt durch "&"
+	char *tempRow = strtok(data, "&");
+	char *tempCol = strtok(NULL, "&");
+	// rest wird zur weiteren Bearbeitung zwischengespeichert
+	char *rest = strtok(NULL, "\0");
+
+	// Zeilen und Spalten werden gesondert herausgesucht
+	row = getValueI(tempRow);
+	col = getValueI(tempCol);
+
+	//    printf("Rows: %d\n", row);
+	//    printf("Cols: %d\n\n", col);
+
+	char ** teile = NULL;
+	char *  p = strtok(rest, "&");
+	int n_spaces = 0;
+
+
+	/* split string and append tokens to 'teile' */
+
+	while (p) {
+		teile = realloc(teile, sizeof(char*) * ++n_spaces);
+
+		if (teile == NULL)
+			exit(-1); /* memory allocation failed */
+
+		teile[n_spaces - 1] = p;
+
+		p = strtok(NULL, "&");
+	}
+
+	// Matrix wird erstellt
+	float matrix[MAX_LENGTH][MAX_LENGTH];
+
+	// Durch alle Variablen durchgehen und jeweilige Werte heraussuchen (letztes nicht mit Token "&", sondern "\0")
+	int i;
+	int tRow = 0;
+	int tCol = 0;
+	for (i = 0; i < row * col; i++) {
+
+		matrix[tRow][tCol] = getValueF(teile[i]);
+		tCol++;
+		if (tCol >= col) {
+			tCol = 0;
+			tRow++;
+			if (tRow >= col) tRow = 0;
+		}
+	}
+
+
+	puts("<!DOCTYPE html>");
+	puts("<head>");
+	puts("  <meta charset=\"utf-8\">");
+	puts("</head>");
+	puts("<body>");
+
+
+	int n = col - 1;//Anzahl der Unbekannten(in der Regel =Anzahl Gleichungen)!!
+	float x[3], d;
+	int fall, rg;
+	rg = n;
+	fall = Gaussalg(matrix, n, x, &rg, 1, &d);
+	switch (fall) {
+	case 0: printf("<br><br>Widerspruch - LGS unloesbar<br><br>"); break;
+	case 1: printf("<br><br><br>LGS eindeutig loesbar:");
+		printf("<br><br>Wert der Koeffizientendeterminante: %.4f<br><br>Loesungsvektor:<br>", d);
+		for (i = 0; i<n; i++) printf("<br>%10.7f", x[i]);
+		printf("<br><br>"); break;
+	case 2: printf("<br><br>mehrdeutige Loesung, Rang=%d", rg);
+		printf("<br>  %d Parameter erforderlich!<br><br>", n - rg);
+	}
+
+
+	puts("</body>");
+	puts("</html>");
+
+	return 0;
+}
+
+int getValueI(char *string) {
+
+	char *vBuf = strtok(string, "=");
+	vBuf = strtok(NULL, "\0");
+
+	return atoi(vBuf);
+}
+
+float getValueF(char *string) {
+
+	char *vBuf = strtok(string, "=");
+	vBuf = strtok(NULL, "\0");
+
+	return atof(vBuf);
+}
+
+void printArray(char **array) {
+	int i;
+	for (i = 0; i < row * col; i++) {
+		printf("Element %d: %s\n", i + 1, array[i]);
+	}
+}
+
+
+
+
+
+
+
+int Gaussalg(float a[][MAX_LENGTH], int n, float x[], int *r, int druck, float *det)
 //Spaltenanzahl muss immer angepasst werden, immer n+1!
 {
 	int   i, j;                      // Zeile, Spalte
@@ -41,11 +143,11 @@ int Gaussalg(float a[][4], int n, float x[], int *r, int druck, float *det)
 
 	s = 0; mf[0] = 0.0f; *det = 0.0f;
 
-	//Ausgabe Original-Matrix 
+	//Ausgabe Original-Matrix
 	if (druck) {
-		printf("Original-Koeffizientenmatrix mit rechter Seite:\n");
+		printf("Original-Koeffizientenmatrix mit rechter Seite:<br>");
 		for (i = 0; i < n; i++) {
-			printf("\n");
+			printf("<br>");
 			for (j = 0; j <= n; j++) printf("%7.2f   ", a[i][j]);
 		}
 	}
@@ -53,7 +155,7 @@ int Gaussalg(float a[][4], int n, float x[], int *r, int druck, float *det)
 		Maximum = fabs(a[s][s]);   // groesstes Element
 		if (Maximum < Epsilon)  break;
 		//nicht eindeutig loesbar oder Widerspruch (unloesbar)
-		if (druck) printf("\n\nSchritt %2i von %2i", s + 1, n - 1);
+		if (druck) printf("<br><br>Schritt %2i von %2i", s + 1, n - 1);
 		pzeile = s;               // suchen
 		for (i = s + 1; i < n; i++)
 			if (fabs(a[i][s]) > Maximum) {
@@ -68,8 +170,8 @@ int Gaussalg(float a[][4], int n, float x[], int *r, int druck, float *det)
 				a[s][j] = a[pzeile][j];
 				a[pzeile][j] = h1;
 			}
-			if (druck) printf("  (Tausch Zeile %2i mit %2i)\n", pzeile + 1, s + 1);
-			else printf("\n");
+			if (druck) printf("  (Tausch Zeile %2i mit %2i)<br>", pzeile + 1, s + 1);
+			else printf("<br>");
 		}
 
 		// Elimination --> Nullen in Spalte s ab Zeile s+1
@@ -82,7 +184,7 @@ int Gaussalg(float a[][4], int n, float x[], int *r, int druck, float *det)
 		//Ausgabe Matrix nach jedem Schritt
 		if (druck) {
 			for (i = 0; i < n; i++) {
-				printf("\n");
+				printf("<br>");
 				for (j = 0; j <= n; j++) printf("%7.2f   ", a[i][j]);
 				if (i>s) printf("%7.2f   ", mf[i]);
 			}
@@ -92,10 +194,7 @@ int Gaussalg(float a[][4], int n, float x[], int *r, int druck, float *det)
 
 	*r = s;
 	h = 0.0f;
-	for (j = 0; j < n; j++)
-	{
-		h = h + a[s][j];
-	}
+	for (j = 0; j < n; j++) h = h + a[s][j];
 	if (fabs(h)<0.00001f) {
 		if (fabs(a[s][s + 1])<0.00001f) return 2;
 		else return 0;
@@ -122,60 +221,5 @@ int Gaussalg(float a[][4], int n, float x[], int *r, int druck, float *det)
 }
 
 
-void main()
-{
-	printf("Content-type: text/html\n\n");
-	printf("<html>\n");
-	printf("<body>\n");
-	
-	//aktuelle Spaltenanzahl muss immer in Definition von Gaussalg angepasst werden
-	// float m[5][6]={{0,0,2,1,1,5},{1,0,0,2,1,5},{1,1,0,0,2,7},{2,1,1,0,0,12},{0,2,1,1,0,11}};
-	// float m[6][7]={{5,0,-1,0,0,7,0},{1,0,0,0,1,0,-1},{0,-1,0,1,-1,0,0},
-	//   {0,0,-1,3,1,0,0},{0,0,0,1,0,1,1},{-10,-5,0,0,2,0,0}};
-	//   float m[5][4]={{1,3,2,19},{2,-18,1,-85},{-6,2,3,1},
-	//    {5,2,-1,19},{3,1,5,161}};
-	//   float m[5][4]={{3,-1,2,1},{7,-4,-1,0},{-1,-3,-12,-5},
-	//    {-1,2,5,2},{0,5,17,7}};
-	//   float m[5][4]={{3,-1,2,1},{7,-4,-1,-2},{-1,-3,-12,-5},
-	//    {-1,2,5,2},{0,5,17,7}};
-	//float m[3][4]={{-10,1,6,2},{8,-1,-16,10},{9,-1,-11,4}};
-	//float m[3][4]={{-0.0125,0.025,0.0,0.5},{-0.0433,-0.0683,-0.0222,2.5},
-	//                 {0.0588,0.0433,0.0333,-3.0}};
-	float m[3][4] = { { 5, -1, 3, 26 }, { 1, -2, 1, 15 },
-	{ -1, 3, 4, 15 } };
-	//float m[3][4]={{1,5,2,5},{2,-2,4,5},{1,1,2,1}}; 
-	//float m[3][4]={{-1,6,2,4},{3,-4,-2,1},{2,-2,-1,2}}; 
-	//  float m[3][4]={{1,-2,-3,8},{2,1,-1,11},{1,3,2,3}}; 
-	//  float m[3][4]={{-1,2,3,1},{2,1,-1,11},{1,3,2,3}}; 
-	//float m[4][5]={{2,-1,3,-1,0},{5,3,2,1,0},{-1,-5,4,-3,0},{-1,6,-7,4,0}}; 
-	//float m[3][4]={{2,3,4,1},{4,3,8,2},{3,2,1,4}};
-	//float m[5][6]={{-1,2,-1,0,1,0},{10,0,3,4,1,12},{3,-1,1,1,0,4},{8,-1,2,3,1,12},{0,0,0,0,0,0}};
-	//float m[5][6]={{1,3,5,7,9,1},{1,-2,3,-4,5,1},{2,11,12,25,22,-3},{0,0,0,0,0,0},{0,0,0,0,0,0}};
-	//float m[3][4]={{2,1,1,0},{-6,3,9,6},{2,2,3,1}}; 
-	//float m[3][4]={{2,1,1,0},{3,-1.5,9,6},{2,2,-1.5,1}}; 
-	//float m[3][4]={{2,3,7,362},{1,-1,6,296},{-1,-10,5,210}};
-	//  float m[3][4]={{1.0/2,1,1.0/3,16},{1.0/4,2,1.0/3,16},
-	//  {1.0/3,1,5.0/9,16}}; 
-	//float m[3][4]={{12,3,-5,-24},{8,-4,2,8},{7,2,-1,7}}; 
-	//float m[3][4]={{1,-1,0,-1},{1,0,-1,6},{0,1,1,7}};
-	//float m[4][5]={{5,-2,-1,4,25},{1,3,5,-1,-16},{2,1,6,1,-19},{8,-1,2,-2,18}}; 
-	int n = 3;//Anzahl der Unbekannten(in der Regel =Anzahl Gleichungen)!!
-	float x[3], d; int i, fall, rg;
-	rg = n;
-	fall = Gaussalg(m, n, x, &rg, 1, &d);
-	switch (fall) {
-	case 0: printf("\n\nWiderspruch - LGS unloesbar\n\n"); break;
-	case 1: printf("\n\n\nLGS eindeutig loesbar:");
-		printf("\n\nWert der Koeffizientendeterminante: %.4f\n\nLoesungsvektor:\n", d);
-		for (i = 0; i<n; i++) printf("\n%10.7f", x[i]);
-		printf("\n\n"); break;
-	case 2: printf("\n\nmehrdeutige Loesung, Rang=%d", rg);
-		printf("\n  %d Parameter erforderlich!\n\n", n - rg);
-		//case 3:  printf ("\nGleichungssystem nicht loesbar oder nicht eindeutig loesbar\n");
-		//        printf ("Rang=%d\n\n",rg);
-	}
-	//scanf("%d", &n); printf("\n\n");// Eingabe, damit Fenster offen bleibt!
 
-	printf("</body>\n");
-	printf("</html>\n");
-}
+
