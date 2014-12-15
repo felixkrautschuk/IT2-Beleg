@@ -25,6 +25,7 @@ int Gaussalg (float a[][MAX_LENGTH], int n, float x[],int *r,int druck,float *de
 
 int main(int argc, const char * argv[]) {
     
+    printf("Content-Type:text/html");
     
     puts("<!DOCTYPE html>");
     puts("<head>");

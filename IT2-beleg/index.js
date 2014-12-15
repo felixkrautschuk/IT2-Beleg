@@ -15,7 +15,7 @@ function createTable(row, col, id)
     formid.value = "reusableForm";
     form.setAttributeNode(formid);
     var action = document.createAttribute("action");
-    action.value = "cgi-bin/gauss.cgi"
+    action.value = "gauss.cgi"
     form.setAttributeNode(action);
     
     // EKELHAFT(BEFEHL)
