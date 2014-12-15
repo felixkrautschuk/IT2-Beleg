@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="test.c">
+    <ClCompile Include="gauss.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
