@@ -5,6 +5,7 @@ function start()
     }
     node = document.getElementById("matrix");
     node.parentNode.insertBefore(createTable(document.getElementById("anzahlGleichungen").value,                                document.getElementById("anzahlUnbekannte").value), node );
+//    node.parentNode.insertAdjacentHTML('','');
 } 
 
 function createTable(row, col, id) 
@@ -16,6 +17,27 @@ function createTable(row, col, id)
     var action = document.createAttribute("action");
     action.value = "cgi-bin/it2.cgi"
     form.setAttributeNode(action);
+    
+    // EKELHAFT(BEFEHL)
+    var rowP = document.createElement("input");
+    var name = document.createAttribute("name");
+    name.value = "row";
+    rowP.setAttributeNode(name);
+    rowP.value = "" + row;
+    var style1 = document.createAttribute("style");
+    style1.value = "display: none;";
+    rowP.setAttributeNode(style1);
+    var colP = document.createElement("input");
+    var name2 = document.createAttribute("name");
+    name2.value = "col";
+    colP.setAttributeNode(name2);
+    colP.value = "" + col;
+    var style2 = document.createAttribute("style");
+    style2.value = "display: none;";
+    colP.setAttributeNode(style2);
+    
+    form.appendChild(rowP);
+    form.appendChild(colP);
 
     var myTable     = document.createElement("table");
     var mytablebody = document.createElement("tbody");
@@ -28,13 +50,13 @@ function createTable(row, col, id)
         {
             mycurrent_cell = document.createElement("td");  
             var newTextfield = document.createElement("input");
+            newTextfield.value = "3";
             var atts = document.createAttribute("id");
-            atts.value = j + "," + i;
+            atts.value = j + "-" + i;
             var name = document.createAttribute("name");
             name.value = "var" + atts.value;
             newTextfield.setAttributeNode(atts);
             newTextfield.setAttributeNode(name);
-//            console.log(atts.value);
             mycurrent_cell.appendChild(newTextfield);
             mycurrent_row.appendChild(mycurrent_cell);
         }
@@ -43,20 +65,13 @@ function createTable(row, col, id)
     myTable.appendChild(mytablebody);
     //myTable.setAttribute("ID", id);
     form.appendChild(myTable);
+    var submitButton = document.createElement("input");
+    var type = document.createAttribute("type");
+    type.value = "submit";
+    var subText = document.createAttribute("value");
+    subText.value = "Los gehts!";
+    submitButton.setAttributeNode(type);
+    submitButton.setAttributeNode(subText);
+    form.appendChild(submitButton);
     return form;
-}
-
-function test()
-{
-    console.log(document.getElementById("0,0").value);
-    //console.log(document.getElementById("matrix").children[0].children[1].innerHTML);
-    //table.rows[r].cells[c].childNodes[0].value;
-
-    //var table = document.getElementById("matrix");
-    //console.log(table);
-    //var row = table.getElementsByTagName("tr");
-    //console.log(row);
-    //console.log(row.cells[0].innerHTML);
-    //console.log(row[1].value);
-   // console.log(document.getElementById("matrix").children[1].val);
 }
