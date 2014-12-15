@@ -43,10 +43,6 @@ int main(int argc, const char * argv[]) {
         return -1;
     }
     
-    // printf("String: %s", data);
-    
-//    char data[512];
-    
     // strtok holt die jeweiligen Werte heraus, getrennt durch "&"
     char *tempRow = strtok(data, "&");
     char *tempCol = strtok(NULL, "&");
@@ -57,16 +53,12 @@ int main(int argc, const char * argv[]) {
     row = getValueI(tempRow);
     col = getValueI(tempCol);
     
-//    printf("Rows: %d\n", row);
-//    printf("Cols: %d\n\n", col);
-    
     char ** teile  = NULL;
     char *  p    = strtok (rest, "&");
     int n_spaces = 0;
     
     
     /* split string and append tokens to 'teile' */
-    
     while (p) {
         teile = realloc (teile, sizeof (char*) * ++n_spaces);
         
@@ -96,9 +88,6 @@ int main(int argc, const char * argv[]) {
         }
     }
     
-    
-    
-
     int n=col - 1;//Anzahl der Unbekannten(in der Regel =Anzahl Gleichungen)!!
     float x[3],d;
     int fall,rg;
