@@ -28,7 +28,7 @@ function createTable(row, col, id)
     formid.value = "reusableForm";
     form.setAttributeNode(formid);
     var action = document.createAttribute("action");
-    action.value = "./gauss.out";
+    action.value = "./gauss.cgi";
     var method = document.createAttribute("METHOD");
     method.value = "GET";
     form.setAttributeNode(method);
