@@ -15,13 +15,13 @@ function start()
     if (document.getElementById("reusableForm") != null) {
         node.parentNode.removeChild(document.getElementById("reusableForm"));
     }
-    node = document.getElementById("matrix");
-    node.parentNode.insertBefore(createTable(anzGleichungen, anzVariablen), node );
+    node = document.getElementById("platzhalter");
+    node.parentNode.insertBefore(createTable(anzGleichungen, anzVariablen) );
 } 
 
 
 
-function createTable(row, col, id) 
+function createTable(row, col) 
 {
     var form = document.createElement("form");
     var formid = document.createAttribute("id");
@@ -29,9 +29,6 @@ function createTable(row, col, id)
     form.setAttributeNode(formid);
     var action = document.createAttribute("action");
     action.value = "./gauss.cgi";
-    var method = document.createAttribute("METHOD");
-    method.value = "GET";
-    form.setAttributeNode(method);
     form.setAttributeNode(action);
     
     form.onsubmit = function()
@@ -49,7 +46,6 @@ function createTable(row, col, id)
         }
     }
     
-    // EKELHAFT(BEFEHL)
     var rowP = document.createElement("input");
     var name = document.createAttribute("name");
     name.value = "row";
@@ -81,7 +77,6 @@ function createTable(row, col, id)
         {
             mycurrent_cell = document.createElement("td");  
             var newTextfield = document.createElement("input");
-//            newTextfield.value = "3";
             var atts = document.createAttribute("id");
             atts.value = j + "-" + i;
             var name = document.createAttribute("name");

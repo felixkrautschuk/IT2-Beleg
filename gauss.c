@@ -1,11 +1,3 @@
-//
-//  main.c
-//  stringTest
-//
-//  Created by Benjamin Herzog on 15.12.14.
-//  Copyright (c) 2014 Benjamin Herzog. All rights teileerved.
-//
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,7 +10,6 @@ int col;
 
 int getValueI(char *string);
 float getValueF(char *string);
-void printArray(char **array);
 void beenden();
 
 int Gaussalg (float a[][MAX_LENGTH], int n, float x[],int *r,int druck,float *det);
@@ -38,14 +29,10 @@ int main(int argc, const char * argv[]) {
     char *data = getenv("QUERY_STRING");
     if(data == NULL)
     {
-        printf("<P>Error! Error in passing data from form to script.");
+        printf("<P>Fehler bei der Übermittlung der Parameter.");
         beenden();
         return -1;
     }
-    
-    // printf("String: %s", data);
-    
-//    char data[512];
     
     // strtok holt die jeweiligen Werte heraus, getrennt durch "&"
     char *tempRow = strtok(data, "&");
@@ -57,21 +44,16 @@ int main(int argc, const char * argv[]) {
     row = getValueI(tempRow);
     col = getValueI(tempCol);
     
-//    printf("Rows: %d\n", row);
-//    printf("Cols: %d\n\n", col);
-    
     char ** teile  = NULL;
     char *  p    = strtok (rest, "&");
     int n_spaces = 0;
     
-    
-    /* split string and append tokens to 'teile' */
-    
+    // Parameter-String in Array zerlegen
     while (p) {
         teile = realloc (teile, sizeof (char*) * ++n_spaces);
         
         if (teile == NULL)
-            exit (-1); /* memory allocation failed */
+            exit (-1);
         
         teile[n_spaces-1] = p;
         
@@ -139,13 +121,6 @@ float getValueF(char *string) {
     vBuf = strtok(NULL, "\0");
     
     return atof(vBuf);
-}
-
-void printArray(char **array) {
-    int i;
-    for (i = 0; i < row * col; i++) {
-        printf("Element %d: %s\n", i + 1, array[i]);
-    }
 }
 
 
