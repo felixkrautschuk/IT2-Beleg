@@ -13,10 +13,11 @@ function start()
     anzVariablen++;
     
     if (document.getElementById("reusableForm") != null) {
-        node.parentNode.removeChild(document.getElementById("reusableForm"));
+        node.removeChild(document.getElementById("reusableForm"));
     }
     node = document.getElementById("platzhalter");
-    node.parentNode.insertBefore(createTable(anzGleichungen, anzVariablen) );
+//    node.parentNode.insertBefore(createTable(anzGleichungen, anzVariablen) );
+    node.appendChild(createTable(anzGleichungen, anzVariablen));
 } 
 
 
